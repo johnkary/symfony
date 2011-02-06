@@ -33,6 +33,9 @@ class InputTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $input->getOption('name'), '->setOption() sets the value for a given option');
         $this->assertEquals(array('name' => 'bar'), $input->getOptions(), '->getOptions() returns all option values');
 
+        $this->assertTrue($input->hasOption('name'), '->hasOption() returns true if an option exists');
+        $this->assertFalse($input->hasOption('baz'), "->hasOption() returns false if an option doesn't exist");
+
         $input = new ArrayInput(array('--name' => 'foo'), new InputDefinition(array(new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default'))));
         $this->assertEquals('default', $input->getOption('bar'), '->getOption() returns the default value for optional options');
         $this->assertEquals(array('name' => 'foo', 'bar' => 'default'), $input->getOptions(), '->getOptions() returns all option values, even optional ones');
@@ -66,6 +69,9 @@ class InputTest extends \PHPUnit_Framework_TestCase
         $input = new ArrayInput(array('name' => 'foo'), new InputDefinition(array(new InputArgument('name'), new InputArgument('bar', InputArgument::OPTIONAL, '', 'default'))));
         $this->assertEquals('default', $input->getArgument('bar'), '->getArgument() returns the default value for optional arguments');
         $this->assertEquals(array('name' => 'foo', 'bar' => 'default'), $input->getArguments(), '->getArguments() returns all argument values, even optional ones');
+
+        $this->assertTrue($input->hasArgument('name'), '->hasArgument() returns true if an argument exists');
+        $this->assertFalse($input->hasArgument('baz'), "->hasArgument() returns false if an argument doesn't exist");
 
         try {
             $input->setArgument('foo', 'bar');
