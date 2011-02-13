@@ -87,4 +87,30 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('The "-o" option does not exist.', $e->getMessage(), '->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
         }
     }
+
+    public function dataParameterOption()
+    {
+        return array(
+            array(array('-f', 'foo', '-b', 'bar'), 'short'),
+            array(array('--foo', 'foo', '--bar', 'bar'), 'long')
+        );
+    }
+
+    /**
+     * @dataProvider dataParameterOption
+     */
+    public function testGetParameterOption($options, $optionType)
+    {
+        $input = new ArrayInput($options);
+        $this->assertSame($options[0], $input->getParameterOption($options[1]), '->getParameterOption() returns '.$optionType.' option when searching by raw value as string');
+        $this->assertFalse($input->getParameterOption('baz'), '->getParameterOption() returns false when raw value as string not found');
+
+        $input = new ArrayInput($options);
+        $searchValues = array('baz', $options[1]);
+        $this->assertSame($option[0], $input->getParameterOption($searchValues), '->getParameterOption() returns '.$optionType.' option when searching by raw values as array');
+
+        $input = new ArrayInput($options);
+        $this->assertSame($options[2], $input->getParameterOption($options[3]), '->getParameterOption() returns second '.$optionType.' option when searching by raw value as string');
+        $this->assertSame($options[2], $input->getParameterOption(array('baz', $options[3])), '->getParameterOption() returns second '.$optionType.' option when searching by raw values array');
+    }
 }
