@@ -251,7 +251,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->add(new \Foo3Command);
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo3:bar'));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3.txt', $this->normalize($tester->getDisplay()), '->renderException() renders a pretty exceptions with previous exceptions');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3.txt', $this->normalize($tester->getDisplay()), '->renderException() renders pretty exceptions with previous exceptions');
 
     }
 
@@ -339,10 +339,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->add(new \FooCommand());
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo:bar', '--no-interaction' => true));
-        $this->assertEquals("called\n", $this->normalize($tester->getDisplay()), '->run() does not called interact() if --no-interaction is passed');
+        $this->assertEquals("called\n", $this->normalize($tester->getDisplay()), '->run() does not call interact() if --no-interaction is passed');
 
         $tester->run(array('command' => 'foo:bar', '-n' => true));
-        $this->assertEquals("called\n", $this->normalize($tester->getDisplay()), '->run() does not called interact() if -n is passed');
+        $this->assertEquals("called\n", $this->normalize($tester->getDisplay()), '->run() does not call interact() if -n is passed');
     }
 }
 
