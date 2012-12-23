@@ -209,8 +209,8 @@ class Request
      */
     public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
-        $this->request = new ParameterBag($request);
         $this->query = new ParameterBag($query);
+        $this->request = new ParameterBag($request);
         $this->attributes = new ParameterBag($attributes);
         $this->cookies = new ParameterBag($cookies);
         $this->files = new FileBag($files);
