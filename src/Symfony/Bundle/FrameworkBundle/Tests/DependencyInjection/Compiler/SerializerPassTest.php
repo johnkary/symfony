@@ -75,13 +75,19 @@ class SerializerPassTest extends \PHPUnit_Framework_TestCase
        $services = array(
             'n3' => array('tag' => array()),
             'n1' => array('tag' => array('priority' => 200)),
-            'n2' => array('tag' => array('priority' => 100))
-        );
+            'n2' => array('tag' => array('priority' => 100)),
+            'n4' => array('tag' => array('priority' => -50)),
+            'n6' => array('tag' => array('priority' => -100)),
+            'n5' => array('tag' => array('priority' => -50)),
+       );
 
        $expected = array(
            new Reference('n1'),
            new Reference('n2'),
-           new Reference('n3')
+           new Reference('n3'),
+           new Reference('n4'),
+           new Reference('n5'),
+           new Reference('n6'),
        );
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
