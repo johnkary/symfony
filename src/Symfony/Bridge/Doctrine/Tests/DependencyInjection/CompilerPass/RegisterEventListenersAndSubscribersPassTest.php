@@ -97,9 +97,15 @@ class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_Te
                 'priority' => 10,
             ))
         ;
+        $container
+            ->register('f', 'stdClass')
+            ->addTag('doctrine.event_subscriber', array(
+                'priority' => -10,
+            ))
+        ;
 
         $this->process($container);
-        $this->assertEquals(array('c', 'd', 'e', 'b', 'a'), $this->getServiceOrder($container, 'addEventSubscriber'));
+        $this->assertEquals(array('c', 'd', 'e', 'b', 'a', 'f'), $this->getServiceOrder($container, 'addEventSubscriber'));
     }
 
     public function testProcessNoTaggedServices()
