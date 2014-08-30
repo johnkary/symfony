@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServicePrioritizer;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -46,17 +47,14 @@ class SerializerPass implements CompilerPassInterface
             throw new \RuntimeException(sprintf('You must tag at least one service as "%s" to use the Serializer service', $tagName));
         }
 
-        $sortedServices = array();
+        $sortedServices = new ServicePrioritizer();
         foreach ($services as $serviceId => $tags) {
             foreach ($tags as $tag) {
                 $priority = isset($tag['priority']) ? $tag['priority'] : 0;
-                $sortedServices[$priority][] = new Reference($serviceId);
+                $sortedServices->add(new Reference($serviceId), $priority);
             }
         }
 
-        krsort($sortedServices);
-
-        // Flatten the array
-        return call_user_func_array('array_merge', $sortedServices);
+        return $sortedServices->toArray();
     }
 }

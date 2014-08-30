@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServicePrioritizer;
 
 /**
  * Adds tagged data_collector services to profiler service
@@ -30,8 +31,7 @@ class ProfilerPass implements CompilerPassInterface
 
         $definition = $container->getDefinition('profiler');
 
-        $collectors = new \SplPriorityQueue();
-        $order = PHP_INT_MAX;
+        $collectors = new ServicePrioritizer();
         foreach ($container->findTaggedServiceIds('data_collector') as $id => $attributes) {
             $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
             $template = null;
@@ -43,11 +43,11 @@ class ProfilerPass implements CompilerPassInterface
                 $template = array($attributes[0]['id'], $attributes[0]['template']);
             }
 
-            $collectors->insert(array($id, $template), array($priority, --$order));
+            $collectors->add(array($id, $template), $priority);
         }
 
         $templates = array();
-        foreach ($collectors as $collector) {
+        foreach ($collectors->toArray() as $collector) {
             $definition->addMethodCall('add', array(new Reference($collector[0])));
             $templates[$collector[0]] = $collector[1];
         }

@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServicePrioritizer;
 
 /**
  * Adds all configured security voters to the access decision manager
@@ -31,16 +32,12 @@ class AddSecurityVotersPass implements CompilerPassInterface
             return;
         }
 
-        $voters = array();
+        $voters = new ServicePrioritizer();
         foreach ($container->findTaggedServiceIds('security.voter') as $id => $attributes) {
             $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $voters[$priority][] = new Reference($id);
+            $voters->add(new Reference($id), $priority);
         }
 
-        // sort by priority and flatten
-        krsort($voters);
-        $voters = call_user_func_array('array_merge', $voters);
-
-        $container->getDefinition('security.access.decision_manager')->replaceArgument(0, $voters);
+        $container->getDefinition('security.access.decision_manager')->replaceArgument(0, $voters->toArray());
     }
 }

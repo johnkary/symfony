@@ -73,4 +73,58 @@ class ProfilerPassTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $methodCalls);
         $this->assertEquals('add', $methodCalls[0][0]); // grab the method part of the first call
     }
+
+    public function testTemplatesRegisteredInPriorityOrder()
+    {
+        $services = array(
+            'my_collector_service4' => array(array(
+                'template' => 'foo4',
+                'id' => 'collector4',
+                'priority' => 100,
+            )),
+            'my_collector_service5' => array(array(
+                'template' => 'foo5',
+                'id' => 'collector5',
+                'priority' => 200,
+            )),
+            'my_collector_service2' => array(array(
+                'template' => 'foo2',
+                'id' => 'collector2',
+                // no priority defined
+            )),
+            'my_collector_service1' => array(array(
+                'template' => 'foo1',
+                'id' => 'collector1',
+                'priority' => -100,
+            )),
+            'my_collector_service3' => array(array(
+                'template' => 'foo3',
+                'id' => 'collector3',
+                'priority' => 100,
+            )),
+        );
+
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $container->expects($this->atLeastOnce())
+            ->method('findTaggedServiceIds')
+            ->will($this->returnValue($services));
+
+        $definition = new Definition('ProfilerClass');
+        $container->expects($this->atLeastOnce())
+            ->method('getDefinition')
+            ->will($this->returnValue($definition));
+
+        $container->expects($this->once())
+            ->method('setParameter')
+            ->with('data_collector.templates', array(
+                'my_collector_service5' => array('collector5', 'foo5'),
+                'my_collector_service4' => array('collector4', 'foo4'),
+                'my_collector_service3' => array('collector3', 'foo3'),
+                'my_collector_service2' => array('collector2', 'foo2'),
+                'my_collector_service1' => array('collector1', 'foo1'),
+            ));
+
+        $profilerPass = new ProfilerPass();
+        $profilerPass->process($container);
+    }
 }
